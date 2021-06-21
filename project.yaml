@@ -1,6 +1,6 @@
 name: gitops-project
 functions:
-- name: gen-iris-sara
+- name: gen-iris
   spec:
     kind: job
     metadata:

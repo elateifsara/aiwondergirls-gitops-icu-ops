@@ -1,67 +1,58 @@
+
 from kfp import dsl
-from mlrun import mount_v3io, NewTask
+import mlrun
+from mlrun.platforms import auto_mount
 
 
 funcs = {}
-this_project = None
-DATASET = 'iris_dataset'
-LABELS  = "label"
+DATASET = 'train_enc'
+TST_DATASET = 'test_enc'
+LABELS =  'diabetes_mellitus'
 
-# init functions is used to configure function resources and local settings
+# Configure function resources and local settings
 def init_functions(functions: dict, project=None, secrets=None):
     for f in functions.values():
-        f.apply(mount_v3io())
-     
-    # uncomment this line to collect the inference results into a stream
-    # and specify a path in V3IO (<datacontainer>/<subpath>)
-    #functions['serving'].set_env('INFERENCE_STREAM', 'users/admin/model_stream')
+        f.apply(auto_mount())
 
-    
+# Create a Kubeflow Pipelines pipeline
 @dsl.pipeline(
-    name="Demo training pipeline",
-    description="Shows how to use mlrun."
+    name="WidsDB2",
+    description="This workflow implements the pipeline for data preprocessing, training model "
+                "serving for Widsdb2 dataset \n"
+                
 )
-def kfpipeline():
-    
-    # run the ingestion function with the new image and params
-    ingest = funcs['gen-iris'].as_step(
-        name="get-data",
-        handler='iris_generator',
-        params={'format': 'pq'},
+
+def kfpipeline(source_url='store://raw_train_data', test_url='store://raw_test_data'):
+
+    # Ingest the data set
+    ingest = funcs['prep'].as_step(
+        name="prep",
+        handler='trdata_prep',
+        inputs={'src': source_url},
         outputs=[DATASET])
-
-    # analyze our dataset
-    describe = funcs["describe"].as_step(
-        name="summary",
-        params={"label_column": LABELS},
-        inputs={"table": ingest.outputs[DATASET]})
     
-    # train with hyper-paremeters
-    train = funcs["train"].as_step(
-        name="train",
-        params={"sample"          : -1,
-                "label_column"    : LABELS,
-                "test_size"       : 0.10},
-        hyperparams={'model_pkg_class': ["sklearn.ensemble.RandomForestClassifier",
-                                         "sklearn.linear_model.LogisticRegression",
-                                         "sklearn.ensemble.AdaBoostClassifier"]},
-        selector='max.accuracy',
-        inputs={"dataset"         : ingest.outputs[DATASET]},
-        labels={"commit": this_project.params.get('commit', '')},
-        outputs=['model', 'test_set'])
-
-    # test and visualize our model
-    test = funcs["test"].as_step(
-        name="test",
+     # Ingest the data set
+    test = funcs['tstprep'].as_step(
+        name="tstprep",
+        handler='tstdata_prep',
+        inputs={'src': test_url},
+        outputs=[TST_DATASET])
+    
+        # Train a model   
+    train = funcs["train-wids"].as_step(
+        name="train-wids",
         params={"label_column": LABELS},
-        inputs={"models_path" : train.outputs['model'],
-                "test_set"    : train.outputs['test_set']})
-
-    # deploy our model as a serverless function
-    deploy = funcs["serving"].deploy_step(models={f"{DATASET}_v1": train.outputs['model']},
-                                          tag=this_project.params.get('commit', 'v1'))
-
-    # test out new model server (via REST API calls)
-    tester = funcs["live_tester"].as_step(name='model-tester',
-        params={'addr': deploy.outputs['endpoint'], 'model': f"{DATASET}_v1"},
-        inputs={'table': train.outputs['test_set']})
+        inputs={"dataset": ingest.outputs[DATASET]},
+        outputs=['model', 'test_set'])
+  
+     # Deploy the model as a serverless function
+    deploy = funcs["lightgbm-serving"].deploy_step(
+        models={f"{DATASET}_v1": train.outputs['model']})
+   
+   # test out new model server (via REST API calls)
+    #tester = funcs["live_tester"].as_step(name='model-tester',
+    #    params={'addr': deploy.outputs['endpoint'], 'model': f"{DATASET}:v1", 'label_column':LABELS},
+    #   inputs={'table': train.outputs['test_set']})
+    
+    
+    ## Run the inference with the serving function

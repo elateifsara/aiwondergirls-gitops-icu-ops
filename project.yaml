@@ -25,25 +25,14 @@ spec:
         entry_points:
           trdata_prep:
             name: trdata_prep
-            doc: "process a raw churn data file\n\nData has 3 states here: `raw`,\
-              \ `cleaned` and `encoded`\n\n* `raw` kept by default, the pipeline begins\
-              \ with a raw data artifact\n* `cleaned` kept for charts, presentations\n\
-              * `encoded` is input for a cross validation and training function\n\n\
-              steps (not necessarily in correct order, some parallel)\n* column name\
-              \ maps\n* deal with nans and other types of missings/junk\n* label encode\
-              \ binary and ordinal category columns\n* create category ranges from\
-              \ numerical columns\nAnd finally,\n* test\n\nWhy we don't one-hot-encode\
-              \ here? One hot encoding isn't a necessary\nstep for all algorithms.\
-              \ It can also generate a very large feature\nmatrix that doesn't need\
-              \ to be serialized (even if sparse).\nSo we leave one-hot-encoding for\
-              \ the training step.\n\nWhat about scaling numerical columns? Same as\
-              \ why we don't one hot\nencode here. Do we scale before train-test split?\
-              \  IMHO, no.  Scaling\nbefore splitting introduces a type of data leakage.\
-              \  In addition,\nmany estimators are completely immune to the monotonic\
-              \ transformations\nimplied by scaling, so why waste the cycles?\n\n\
-              TODO: \n    * parallelize where possible\n    * more abstraction (more\
-              \ parameters, chain sklearn transformers)\n    * convert to marketplace\
-              \ function"
+            doc: "process a raw icu data file\n\n* `encoded` is input for a cross\
+              \ validation and training function\n\nwidsutil module has various transform\
+              \ functions\nsteps (not necessarily in correct order, some parallel)\n\
+              * column name maps\n* deal with nans and other types of missings/junk\n\
+              * label encode binary and ordinal category columns\n* create category\
+              \ ranges from numerical columns\nAnd finally,\n* test\n\n\nTODO: \n\
+              \    * parallelize where possible\n    * more abstraction (more parameters,\
+              \ chain sklearn transformers)\n    * convert to marketplace function"
             parameters:
             - name: context
               type: MLClientCtx
@@ -59,24 +48,28 @@ spec:
               default: csv
             - name: train_enc
               type: str
+              doc: key of encoded data table in artifact store
               default: train_enc
             outputs:
             - default: ''
             lineno: 22
         description: ''
         build:
-          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCmltcG9ydCBvcwoKaW1wb3J0IHN5cwpzeXMucGF0aC5hcHBlbmQoJy92M2lvL3Byb2plY3RzL3dpZHNkYjIvdXRpbCcpCgoKaW1wb3J0IGpzb24KaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgbnVtcHkgYXMgbnAKZnJvbSBjb2xsZWN0aW9ucyBpbXBvcnQgZGVmYXVsdGRpY3QKaW1wb3J0IHdpZHN1dGlsIGFzIHV0aWwKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgZHVtcHMsIGR1bXAsIGxvYWQKCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgoKZGVmIHRyZGF0YV9wcmVwKAogICAgY29udGV4dDpNTENsaWVudEN0eCwgCiAgICBzcmM6IERhdGFJdGVtLAogICAgZmlsZV9leHQ6IHN0ciA9ICJjc3YiLAogICAgdHJhaW5fZW5jOiBzdHIgPSAidHJhaW5fZW5jIgopOgogICAgIiIicHJvY2VzcyBhIHJhdyBjaHVybiBkYXRhIGZpbGUKICAgIAogICAgRGF0YSBoYXMgMyBzdGF0ZXMgaGVyZTogYHJhd2AsIGBjbGVhbmVkYCBhbmQgYGVuY29kZWRgCiAgICAKICAgICogYHJhd2Aga2VwdCBieSBkZWZhdWx0LCB0aGUgcGlwZWxpbmUgYmVnaW5zIHdpdGggYSByYXcgZGF0YSBhcnRpZmFjdAogICAgKiBgY2xlYW5lZGAga2VwdCBmb3IgY2hhcnRzLCBwcmVzZW50YXRpb25zCiAgICAqIGBlbmNvZGVkYCBpcyBpbnB1dCBmb3IgYSBjcm9zcyB2YWxpZGF0aW9uIGFuZCB0cmFpbmluZyBmdW5jdGlvbgogICAgCiAgICBzdGVwcyAobm90IG5lY2Vzc2FyaWx5IGluIGNvcnJlY3Qgb3JkZXIsIHNvbWUgcGFyYWxsZWwpCiAgICAqIGNvbHVtbiBuYW1lIG1hcHMKICAgICogZGVhbCB3aXRoIG5hbnMgYW5kIG90aGVyIHR5cGVzIG9mIG1pc3NpbmdzL2p1bmsKICAgICogbGFiZWwgZW5jb2RlIGJpbmFyeSBhbmQgb3JkaW5hbCBjYXRlZ29yeSBjb2x1bW5zCiAgICAqIGNyZWF0ZSBjYXRlZ29yeSByYW5nZXMgZnJvbSBudW1lcmljYWwgY29sdW1ucwogICAgQW5kIGZpbmFsbHksCiAgICAqIHRlc3QKICAgIAogICAgV2h5IHdlIGRvbid0IG9uZS1ob3QtZW5jb2RlIGhlcmU/IE9uZSBob3QgZW5jb2RpbmcgaXNuJ3QgYSBuZWNlc3NhcnkKICAgIHN0ZXAgZm9yIGFsbCBhbGdvcml0aG1zLiBJdCBjYW4gYWxzbyBnZW5lcmF0ZSBhIHZlcnkgbGFyZ2UgZmVhdHVyZQogICAgbWF0cml4IHRoYXQgZG9lc24ndCBuZWVkIHRvIGJlIHNlcmlhbGl6ZWQgKGV2ZW4gaWYgc3BhcnNlKS4KICAgIFNvIHdlIGxlYXZlIG9uZS1ob3QtZW5jb2RpbmcgZm9yIHRoZSB0cmFpbmluZyBzdGVwLgogICAgCiAgICBXaGF0IGFib3V0IHNjYWxpbmcgbnVtZXJpY2FsIGNvbHVtbnM/IFNhbWUgYXMgd2h5IHdlIGRvbid0IG9uZSBob3QKICAgIGVuY29kZSBoZXJlLiBEbyB3ZSBzY2FsZSBiZWZvcmUgdHJhaW4tdGVzdCBzcGxpdD8gIElNSE8sIG5vLiAgU2NhbGluZwogICAgYmVmb3JlIHNwbGl0dGluZyBpbnRyb2R1Y2VzIGEgdHlwZSBvZiBkYXRhIGxlYWthZ2UuICBJbiBhZGRpdGlvbiwKICAgIG1hbnkgZXN0aW1hdG9ycyBhcmUgY29tcGxldGVseSBpbW11bmUgdG8gdGhlIG1vbm90b25pYyB0cmFuc2Zvcm1hdGlvbnMKICAgIGltcGxpZWQgYnkgc2NhbGluZywgc28gd2h5IHdhc3RlIHRoZSBjeWNsZXM/CiAgICAKICAgIFRPRE86IAogICAgICAgICogcGFyYWxsZWxpemUgd2hlcmUgcG9zc2libGUKICAgICAgICAqIG1vcmUgYWJzdHJhY3Rpb24gKG1vcmUgcGFyYW1ldGVycywgY2hhaW4gc2tsZWFybiB0cmFuc2Zvcm1lcnMpCiAgICAgICAgKiBjb252ZXJ0IHRvIG1hcmtldHBsYWNlIGZ1bmN0aW9uCiAgICAgICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgdGhlIGZ1bmN0aW9uIGV4ZWN1dGlvbiBjb250ZXh0CiAgICA6cGFyYW0gc3JjOiAgICAgICAgICAgICAgYW4gYXJ0aWZhY3Qgb3IgZmlsZSBwYXRoCiAgICA6cGFyYW0gZmlsZV9leHQ6ICAgICAgICAgZmlsZSB0eXBlIGZvciBhcnRpZmFjdHMKICAgIDpwYXJhbSBlbmNvZGVkX2tleTogICAgICBrZXkgb2YgZW5jb2RlZCBkYXRhIHRhYmxlIGluIGFydGlmYWN0IHN0b3JlCiAgICAiIiIKICAgIGRmID0gc3JjLmFzX2RmKCkKICAgIAogICAgZGF0YXByZXByb2Nlc3MgPXV0aWwuRGF0YVByZXByb2Nlc3MoZGYpCiAgICBkZiA9IGRhdGFwcmVwcm9jZXNzLnByZXByb2Nlc3MoKQoKICAgIGRmID0gZGYuZmlsbG5hKDApCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KHRyYWluX2VuYywgZGY9ZGYsIGZvcm1hdD1maWxlX2V4dCwgaW5kZXg9RmFsc2UpCgo=
+          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCmltcG9ydCBvcwoKaW1wb3J0IHN5cwpzeXMucGF0aC5hcHBlbmQoJy92M2lvL3Byb2plY3RzL3dpZHNkYjIvdXRpbCcpCgoKaW1wb3J0IGpzb24KaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgbnVtcHkgYXMgbnAKZnJvbSBjb2xsZWN0aW9ucyBpbXBvcnQgZGVmYXVsdGRpY3QKaW1wb3J0IHdpZHN1dGlsIGFzIHV0aWwKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgZHVtcHMsIGR1bXAsIGxvYWQKCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgoKZGVmIHRyZGF0YV9wcmVwKAogICAgY29udGV4dDpNTENsaWVudEN0eCwgCiAgICBzcmM6IERhdGFJdGVtLAogICAgZmlsZV9leHQ6IHN0ciA9ICJjc3YiLAogICAgdHJhaW5fZW5jOiBzdHIgPSAidHJhaW5fZW5jIgopOgogICAgIiIicHJvY2VzcyBhIHJhdyBpY3UgZGF0YSBmaWxlCiAgICAKICAgICogYGVuY29kZWRgIGlzIGlucHV0IGZvciBhIGNyb3NzIHZhbGlkYXRpb24gYW5kIHRyYWluaW5nIGZ1bmN0aW9uCiAgICAKICAgIHdpZHN1dGlsIG1vZHVsZSBoYXMgdmFyaW91cyB0cmFuc2Zvcm0gZnVuY3Rpb25zCiAgICBzdGVwcyAobm90IG5lY2Vzc2FyaWx5IGluIGNvcnJlY3Qgb3JkZXIsIHNvbWUgcGFyYWxsZWwpCiAgICAqIGNvbHVtbiBuYW1lIG1hcHMKICAgICogZGVhbCB3aXRoIG5hbnMgYW5kIG90aGVyIHR5cGVzIG9mIG1pc3NpbmdzL2p1bmsKICAgICogbGFiZWwgZW5jb2RlIGJpbmFyeSBhbmQgb3JkaW5hbCBjYXRlZ29yeSBjb2x1bW5zCiAgICAqIGNyZWF0ZSBjYXRlZ29yeSByYW5nZXMgZnJvbSBudW1lcmljYWwgY29sdW1ucwogICAgQW5kIGZpbmFsbHksCiAgICAqIHRlc3QKICAgIAogICAKICAgIFRPRE86IAogICAgICAgICogcGFyYWxsZWxpemUgd2hlcmUgcG9zc2libGUKICAgICAgICAqIG1vcmUgYWJzdHJhY3Rpb24gKG1vcmUgcGFyYW1ldGVycywgY2hhaW4gc2tsZWFybiB0cmFuc2Zvcm1lcnMpCiAgICAgICAgKiBjb252ZXJ0IHRvIG1hcmtldHBsYWNlIGZ1bmN0aW9uCiAgICAgICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgdGhlIGZ1bmN0aW9uIGV4ZWN1dGlvbiBjb250ZXh0CiAgICA6cGFyYW0gc3JjOiAgICAgICAgICAgICAgYW4gYXJ0aWZhY3Qgb3IgZmlsZSBwYXRoCiAgICA6cGFyYW0gZmlsZV9leHQ6ICAgICAgICAgZmlsZSB0eXBlIGZvciBhcnRpZmFjdHMKICAgIDpwYXJhbSB0cmFpbl9lbmM6ICAgICAgICBrZXkgb2YgZW5jb2RlZCBkYXRhIHRhYmxlIGluIGFydGlmYWN0IHN0b3JlCiAgICAiIiIKICAgIGRmID0gc3JjLmFzX2RmKCkKICAgIAogICAgZGF0YXByZXByb2Nlc3MgPXV0aWwuRGF0YVByZXByb2Nlc3MoZGYpCiAgICBkZiA9IGRhdGFwcmVwcm9jZXNzLnByZXByb2Nlc3MoKQoKICAgIGRmLmZpbGxuYShkZi5tZWFuKCksIGlucGxhY2U9VHJ1ZSkKCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KHRyYWluX2VuYywgZGY9ZGYsIGZvcm1hdD1maWxlX2V4dCwgaW5kZXg9RmFsc2UpCgo=
           commands: []
           code_origin: prep.ipynb
         affinity: null
       verbose: false
-  - name: tstprep
+  - name: train-wids
     spec:
       kind: job
       metadata:
-        name: tstprep
-        tag: ''
+        name: train-wids
+        tag: latest
+        hash: ac57b01232e7d6bf0ec08e68a6f87cf64728e063
         project: widsdb2
+        categories: []
+        updated: '2021-07-01T11:08:37.142283+00:00'
       spec:
         command: ''
         args: []
@@ -88,70 +81,6 @@ spec:
           value: ''
         - name: V3IO_ACCESS_KEY
           value: ''
-        default_handler: tstdata_prep
-        entry_points:
-          tstdata_prep:
-            name: tstdata_prep
-            doc: "process a raw churn data file\n\nData has 3 states here: `raw`,\
-              \ `cleaned` and `encoded`\n\n* `raw` kept by default, the pipeline begins\
-              \ with a raw data artifact\n* `cleaned` kept for charts, presentations\n\
-              * `encoded` is input for a cross validation and training function\n\n\
-              steps (not necessarily in correct order, some parallel)\n* column name\
-              \ maps\n* deal with nans and other types of missings/junk\n* label encode\
-              \ binary and ordinal category columns\n* create category ranges from\
-              \ numerical columns\nAnd finally,\n* test\n\nWhy we don't one-hot-encode\
-              \ here? One hot encoding isn't a necessary\nstep for all algorithms.\
-              \ It can also generate a very large feature\nmatrix that doesn't need\
-              \ to be serialized (even if sparse).\nSo we leave one-hot-encoding for\
-              \ the training step.\n\nWhat about scaling numerical columns? Same as\
-              \ why we don't one hot\nencode here. Do we scale before train-test split?\
-              \  IMHO, no.  Scaling\nbefore splitting introduces a type of data leakage.\
-              \  In addition,\nmany estimators are completely immune to the monotonic\
-              \ transformations\nimplied by scaling, so why waste the cycles?\n\n\
-              TODO: \n    * parallelize where possible\n    * more abstraction (more\
-              \ parameters, chain sklearn transformers)\n    * convert to marketplace\
-              \ function"
-            parameters:
-            - name: context
-              type: MLClientCtx
-              doc: the function execution context
-              default: ''
-            - name: src
-              type: DataItem
-              doc: an artifact or file path
-              default: ''
-            - name: file_ext
-              type: str
-              doc: file type for artifacts
-              default: csv
-            - name: test_enc
-              type: str
-              default: test_enc
-            outputs:
-            - default: ''
-            lineno: 22
-        description: ''
-        build:
-          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKCmltcG9ydCBzeXMKc3lzLnBhdGguYXBwZW5kKCcvdjNpby9wcm9qZWN0cy93aWRzZGIyL3V0aWwnKQoKCmltcG9ydCBqc29uCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gY29sbGVjdGlvbnMgaW1wb3J0IGRlZmF1bHRkaWN0CmltcG9ydCB3aWRzdXRpbCBhcyB1dGlsCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzLCBkdW1wLCBsb2FkCgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKZGVmIHRzdGRhdGFfcHJlcCgKICAgIGNvbnRleHQ6TUxDbGllbnRDdHgsIAogICAgc3JjOiBEYXRhSXRlbSwKICAgIGZpbGVfZXh0OiBzdHIgPSAiY3N2IiwKICAgIHRlc3RfZW5jOiBzdHIgPSAidGVzdF9lbmMiCik6CiAgICAiIiJwcm9jZXNzIGEgcmF3IGNodXJuIGRhdGEgZmlsZQogICAgCiAgICBEYXRhIGhhcyAzIHN0YXRlcyBoZXJlOiBgcmF3YCwgYGNsZWFuZWRgIGFuZCBgZW5jb2RlZGAKICAgIAogICAgKiBgcmF3YCBrZXB0IGJ5IGRlZmF1bHQsIHRoZSBwaXBlbGluZSBiZWdpbnMgd2l0aCBhIHJhdyBkYXRhIGFydGlmYWN0CiAgICAqIGBjbGVhbmVkYCBrZXB0IGZvciBjaGFydHMsIHByZXNlbnRhdGlvbnMKICAgICogYGVuY29kZWRgIGlzIGlucHV0IGZvciBhIGNyb3NzIHZhbGlkYXRpb24gYW5kIHRyYWluaW5nIGZ1bmN0aW9uCiAgICAKICAgIHN0ZXBzIChub3QgbmVjZXNzYXJpbHkgaW4gY29ycmVjdCBvcmRlciwgc29tZSBwYXJhbGxlbCkKICAgICogY29sdW1uIG5hbWUgbWFwcwogICAgKiBkZWFsIHdpdGggbmFucyBhbmQgb3RoZXIgdHlwZXMgb2YgbWlzc2luZ3MvanVuawogICAgKiBsYWJlbCBlbmNvZGUgYmluYXJ5IGFuZCBvcmRpbmFsIGNhdGVnb3J5IGNvbHVtbnMKICAgICogY3JlYXRlIGNhdGVnb3J5IHJhbmdlcyBmcm9tIG51bWVyaWNhbCBjb2x1bW5zCiAgICBBbmQgZmluYWxseSwKICAgICogdGVzdAogICAgCiAgICBXaHkgd2UgZG9uJ3Qgb25lLWhvdC1lbmNvZGUgaGVyZT8gT25lIGhvdCBlbmNvZGluZyBpc24ndCBhIG5lY2Vzc2FyeQogICAgc3RlcCBmb3IgYWxsIGFsZ29yaXRobXMuIEl0IGNhbiBhbHNvIGdlbmVyYXRlIGEgdmVyeSBsYXJnZSBmZWF0dXJlCiAgICBtYXRyaXggdGhhdCBkb2Vzbid0IG5lZWQgdG8gYmUgc2VyaWFsaXplZCAoZXZlbiBpZiBzcGFyc2UpLgogICAgU28gd2UgbGVhdmUgb25lLWhvdC1lbmNvZGluZyBmb3IgdGhlIHRyYWluaW5nIHN0ZXAuCiAgICAKICAgIFdoYXQgYWJvdXQgc2NhbGluZyBudW1lcmljYWwgY29sdW1ucz8gU2FtZSBhcyB3aHkgd2UgZG9uJ3Qgb25lIGhvdAogICAgZW5jb2RlIGhlcmUuIERvIHdlIHNjYWxlIGJlZm9yZSB0cmFpbi10ZXN0IHNwbGl0PyAgSU1ITywgbm8uICBTY2FsaW5nCiAgICBiZWZvcmUgc3BsaXR0aW5nIGludHJvZHVjZXMgYSB0eXBlIG9mIGRhdGEgbGVha2FnZS4gIEluIGFkZGl0aW9uLAogICAgbWFueSBlc3RpbWF0b3JzIGFyZSBjb21wbGV0ZWx5IGltbXVuZSB0byB0aGUgbW9ub3RvbmljIHRyYW5zZm9ybWF0aW9ucwogICAgaW1wbGllZCBieSBzY2FsaW5nLCBzbyB3aHkgd2FzdGUgdGhlIGN5Y2xlcz8KICAgIAogICAgVE9ETzogCiAgICAgICAgKiBwYXJhbGxlbGl6ZSB3aGVyZSBwb3NzaWJsZQogICAgICAgICogbW9yZSBhYnN0cmFjdGlvbiAobW9yZSBwYXJhbWV0ZXJzLCBjaGFpbiBza2xlYXJuIHRyYW5zZm9ybWVycykKICAgICAgICAqIGNvbnZlcnQgdG8gbWFya2V0cGxhY2UgZnVuY3Rpb24KICAgICAgICAKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgICB0aGUgZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBzcmM6ICAgICAgICAgICAgICBhbiBhcnRpZmFjdCBvciBmaWxlIHBhdGgKICAgIDpwYXJhbSBmaWxlX2V4dDogICAgICAgICBmaWxlIHR5cGUgZm9yIGFydGlmYWN0cwogICAgOnBhcmFtIG1vZGVsc19kZXN0OiAgICAgICBsYWJlbCBlbmNvZGVycyBhbmQgb3RoZXIgcHJlcHJvY2Vzc2luZyBzdGVwcwogICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNob3VsZCBiZSBzYXZlZCB0b2dldGhlciB3aXRoIG90aGVyIHBpcGVsaW5lCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbW9kZWxzCiAgICA6cGFyYW0gY2xlYW5lZF9rZXk6ICAgICAga2V5IG9mIGNsZWFuZWQgZGF0YSB0YWJsZSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGVuY29kZWRfa2V5OiAgICAgIGtleSBvZiBlbmNvZGVkIGRhdGEgdGFibGUgaW4gYXJ0aWZhY3Qgc3RvcmUKICAgICIiIgogICAgZGYgPSBzcmMuYXNfZGYoKQogICAgCiAgICBkYXRhcHJlcHJvY2VzcyA9dXRpbC5EYXRhUHJlcHJvY2VzcyhkZikKICAgIGRmID0gZGF0YXByZXByb2Nlc3MucHJlcHJvY2VzcygpCgogICAgZGYgPSBkZi5maWxsbmEoMCkKICAgIGNvbnRleHQubG9nX2RhdGFzZXQodGVzdF9lbmMsIGRmPWRmLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQoK
-          commands: []
-          code_origin: tstprep.ipynb
-        affinity: null
-      verbose: false
-  - name: train-wids
-    spec:
-      kind: job
-      metadata:
-        name: train-wids
-        tag: latest
-        hash: 982546300737e4196cbcb3ca7d5ec1d064cb5bac
-        project: widsdb2
-        categories: []
-        updated: '2021-06-21T16:23:04.628678+00:00'
-      spec:
-        command: ''
-        args: []
-        image: mlrun/ml-models
-        env: []
         default_handler: train_wids
         entry_points:
           train_wids:
@@ -172,7 +101,7 @@ spec:
             lineno: 39
         description: ''
         build:
-          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBza2xlYXJuIGltcG9ydCBsaW5lYXJfbW9kZWwKZnJvbSBza2xlYXJuIGltcG9ydCBkYXRhc2V0cwpmcm9tIHNrbGVhcm4ubW9kZWxfc2VsZWN0aW9uIGltcG9ydCB0cmFpbl90ZXN0X3NwbGl0CmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCmltcG9ydCBwYW5kYXMgYXMgcGQKCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5tbHV0aWxzLmRhdGEgaW1wb3J0IGdldF9zYW1wbGUKZnJvbSBtbHJ1bi5tbHV0aWxzLnBsb3RzIGltcG9ydCBldmFsX21vZGVsX3YyCmZyb20gc2NpcHkuc3RhdHMgaW1wb3J0IGt1cnRvc2lzLCBpcXIsIHNrZXcsIGdtZWFuLCBobWVhbiwgbW9kZSwgbm9ybWFsdGVzdCwgc2hhcGlybywga3NfMnNhbXAKZnJvbSBza2xlYXJuLnByZXByb2Nlc3NpbmcgaW1wb3J0IFN0YW5kYXJkU2NhbGVyLCBPbmVIb3RFbmNvZGVyLCBMYWJlbEVuY29kZXIsIE9yZGluYWxFbmNvZGVyCmZyb20gbG9nZ2luZyBpbXBvcnQgZ2V0TG9nZ2VyLCBGb3JtYXR0ZXIsIFN0cmVhbUhhbmRsZXIsIEZpbGVIYW5kbGVyLCBJTkZPLCBFUlJPUgpmcm9tIHNrbGVhcm4uY29tcG9zZSBpbXBvcnQgbWFrZV9jb2x1bW5fc2VsZWN0b3IgYXMgc2VsZWN0b3IKZnJvbSBza2xlYXJuLmNvbXBvc2UgaW1wb3J0IENvbHVtblRyYW5zZm9ybWVyCmZyb20gc2tsZWFybi5tZXRyaWNzIGltcG9ydCByb2NfYXVjX3Njb3JlCmZyb20gc2tsZWFybi5tb2RlbF9zZWxlY3Rpb24gaW1wb3J0IEtGb2xkCmZyb20gc2tsZWFybi5pbXB1dGUgaW1wb3J0IFNpbXBsZUltcHV0ZXIKZnJvbSBza2xlYXJuLnBpcGVsaW5lIGltcG9ydCBQaXBlbGluZQppbXBvcnQgb3MsIGdjLCBzeXMsIHRpbWUsIHJhbmRvbSwgbWF0aApmcm9tIGNvbnRleHRsaWIgaW1wb3J0IGNvbnRleHRtYW5hZ2VyCmZyb20gbWF0cGxvdGxpYiBpbXBvcnQgcHlwbG90IGFzIHBsdApmcm9tIElQeXRob24uZGlzcGxheSBpbXBvcnQgZGlzcGxheQpmcm9tIHNjaXB5IGltcG9ydCBzdGF0cywgc3BlY2lhbApmcm9tIHNrbGVhcm4gaW1wb3J0IHNldF9jb25maWcKZnJvbSBmdW5jdG9vbHMgaW1wb3J0IHBhcnRpYWwKaW1wb3J0IGxpZ2h0Z2JtIGFzIGxnYgppbXBvcnQgc2VhYm9ybiBhcyBzbnMKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgdHlwaW5nIGFzIHRwCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQgd2FybmluZ3MKCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoJ2lnbm9yZScpCgpkZWYgdHJhaW5fd2lkcyhjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICAgICAgICAgZGF0YXNldDogRGF0YUl0ZW0sCiAgICAgICAgICAgICAgIGxhYmVsX2NvbHVtbjogc3RyID0gImxhYmVscyIpOgoKICAgIHJhdywgbGFiZWxzLCBoZWFkZXIgPSBnZXRfc2FtcGxlKGRhdGFzZXQsIHNhbXBsZT0tMSwgbGFiZWw9bGFiZWxfY29sdW1uKQogICAgcHJpbnQocmF3LnNoYXBlKQogICAgWF90cmFpbiwgWF90ZXN0LCB5X3RyYWluLCB5X3Rlc3QgPSB0cmFpbl90ZXN0X3NwbGl0KAogICAgICAgIHJhdywgbGFiZWxzLCB0ZXN0X3NpemU9MC4yLCByYW5kb21fc3RhdGU9NDIpCiAgICAKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoJ3RyYWluX3NldCcsIAogICAgICAgICAgICAgICAgICAgICAgICBkZj1wZC5jb25jYXQoW1hfdHJhaW4sIHlfdHJhaW4udG9fZnJhbWUoKV0sIGF4aXM9MSksCiAgICAgICAgICAgICAgICAgICAgICAgIGZvcm1hdD0nY3N2JywgaW5kZXg9RmFsc2UsIAogICAgICAgICAgICAgICAgICAgICAgICBhcnRpZmFjdF9wYXRoPWNvbnRleHQuYXJ0aWZhY3Rfc3VicGF0aCgnZGF0YScpKQoKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoJ3Rlc3Rfc2V0JywgCiAgICAgICAgICAgICAgICAgICAgICAgIGRmPXBkLmNvbmNhdChbWF90ZXN0LCB5X3Rlc3QudG9fZnJhbWUoKV0sIGF4aXM9MSksCiAgICAgICAgICAgICAgICAgICAgICAgIGZvcm1hdD0nY3N2JywgaW5kZXg9RmFsc2UsIAogICAgICAgICAgICAgICAgICAgICAgICBsYWJlbHM9eyJkYXRhLXR5cGUiOiAiaGVsZC1vdXQifSwKICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3RfcGF0aD1jb250ZXh0LmFydGlmYWN0X3N1YnBhdGgoJ2RhdGEnKSkKICAgCgogICAgbHBhcmFtcyA9IHt9CgogICAgZXZhbHMgPSB7fQogICAgZXZhbHNbJ2xnYiddID0ge30KICAgIGxwYXJhbXMgPSB7fQoKICAgIHNlZWRzID0gWzAsIDFdCiAgICBuZm9sZCA9IFs1LCA1XQogICAgc3RyYXRpZmllZD1bRmFsc2UsIEZhbHNlXQogICAgc2h1ZmZsZT1bVHJ1ZSwgVHJ1ZV0KICAgIG5fZXN0aW1hdG9ycyA9IDMwMDAwCiAgICBlYXJseV9zdG9wcGluZ19yb3VuZHMgPSAzMDAKICAgIHZlcmJvc2VfZXZhbCA9IDIKICAgIGxlYXJuaW5nX3JhdGUgPSAwLjAxCiAgICByZWdfYWxwaGEgPSBbMC40LCAxXQogICAgcmVnX2xhbWJkYSA9IFswLjcsIDFdCiAgICBzdWJzYW1wbGUgPSBbMC40NSwgMV0KICAgIGNvbHNhbXBsZV9ieXRyZWUgPSBbMC4zLCAwLjIyNV0KICAgIG1heF9kZXB0aCA9IC0xCiAgICB2ZXJib3NlID0gNAogICAgbl9qb2JzID0gNAogICAgCiAgICBscGFyYW1zID0gZGljdChib29zdGluZ190eXBlPSdnYmR0JywKICAgICAgICAgICAgICAgb2JqZWN0aXZlPSdiaW5hcnknLAogICAgICAgICAgICAgICBtZXRyaWM9J2F1YycsCiAgICAgICAgICAgICAgIGxlYXJuaW5nX3JhdGU9IGxlYXJuaW5nX3JhdGUsCiAgICAgICAgICAgICAgIG51bV9sZWF2ZXM9IDIwMCwKICAgICAgICAgICAgICAgbWF4X2Jpbj01MDAsCiAgICAgICAgICAgICAgIG1pbl9jaGlsZF93ZWlnaHQ9IDAuMDM1LAogICAgICAgICAgICAgICBzdWJzYW1wbGU9IHN1YnNhbXBsZVswXSwKICAgICAgICAgICAgICAgY29sc2FtcGxlX2J5dHJlZT0gY29sc2FtcGxlX2J5dHJlZVswXSwKICAgICAgICAgICAgICAgbWluX2RhdGFfaW5fbGVhZj0gMTUwLAogICAgICAgICAgICAgICBtYXhfZGVwdGg9IG1heF9kZXB0aCwKICAgICAgICAgICAgICAgYmFnZ2luZ19zZWVkPSBzZWVkc1swXSwKICAgICAgICAgICAgICAgcmVnX2FscGhhPSByZWdfYWxwaGFbMF0sCiAgICAgICAgICAgICAgIHJlZ19sYW1iZGE9IHJlZ19sYW1iZGFbMF0sCiAgICAgICAgICAgICAgIHZlcmJvc2U9IHZlcmJvc2UsCiAgICAgICAgICAgICAgIHNlZWQ9IHNlZWRzWzBdLAogICAgICAgICAgICAgICBuX2pvYnM9IG5fam9icywpCgogICAgZXZhbHNfcmVzdWx0ID0ge30KICAgIHRlc3RfcHJlZHMgPSBucC56ZXJvcyhsZW4oWF90ZXN0KSkgICAgCiAgICBkdHJhaW4gPSBsZ2IuRGF0YXNldChYX3RyYWluLCB5X3RyYWluKQogICAgZHRlc3QgPSBsZ2IuRGF0YXNldChYX3Rlc3QsIGxhYmVsPXlfdGVzdCkKICAgIAogICAgdGVzdGxlbiA9IFhfdGVzdC5zaGFwZVswXQogICAgCiAgICBzZWVkID0gc2VlZHNbMF0KICAgIHByaW50KGYnVHJhaW5pbmcgTW9kZWwgd2l0aCBTRUVEIDoge3NlZWR9JykKICAgIGk9MAogICAgbW9kZWwgPSBsZ2IudHJhaW4obHBhcmFtcywgZHRyYWluLCAxMDAsIHZhbGlkX3NldHM9ZHRlc3QsIGVhcmx5X3N0b3BwaW5nX3JvdW5kcz01LCBldmFsc19yZXN1bHQ9ZXZhbHNfcmVzdWx0KQogICAgbW9kZWwuc2F2ZV9tb2RlbCgnbW9kZWwudHh0JywgbnVtX2l0ZXJhdGlvbj1tb2RlbC5iZXN0X2l0ZXJhdGlvbikKICAgIAogICAKICAgCiAgICAKICAgIHByZWQgPSBtb2RlbC5wcmVkaWN0KFhfdGVzdCkKICAgIAogICAgCiAgICBjb250ZXh0LmxvZ19tb2RlbCgibW9kZWwiLAogICAgICAgICAgICAgICAgICAgICAgYm9keT1kdW1wcyhtb2RlbCksCiAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgIG1vZGVsX2ZpbGU9Im1vZGVsLnBrbCIsCiAgICAgICAgICAgICAgICAgICAgICBtZXRyaWNzPWNvbnRleHQucmVzdWx0cywKICAgICAgICAgICAgICAgICAgICAgIGxhYmVscz17ImNsYXNzIjogImxpZ2h0Z2JtIn0pCiAgICAKCg==
+          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBza2xlYXJuIGltcG9ydCBsaW5lYXJfbW9kZWwKZnJvbSBza2xlYXJuIGltcG9ydCBkYXRhc2V0cwpmcm9tIHNrbGVhcm4ubW9kZWxfc2VsZWN0aW9uIGltcG9ydCB0cmFpbl90ZXN0X3NwbGl0CmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCmltcG9ydCBwYW5kYXMgYXMgcGQKCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5tbHV0aWxzLmRhdGEgaW1wb3J0IGdldF9zYW1wbGUKZnJvbSBtbHJ1bi5tbHV0aWxzLnBsb3RzIGltcG9ydCBldmFsX21vZGVsX3YyCmZyb20gc2NpcHkuc3RhdHMgaW1wb3J0IGt1cnRvc2lzLCBpcXIsIHNrZXcsIGdtZWFuLCBobWVhbiwgbW9kZSwgbm9ybWFsdGVzdCwgc2hhcGlybywga3NfMnNhbXAKZnJvbSBza2xlYXJuLnByZXByb2Nlc3NpbmcgaW1wb3J0IFN0YW5kYXJkU2NhbGVyLCBPbmVIb3RFbmNvZGVyLCBMYWJlbEVuY29kZXIsIE9yZGluYWxFbmNvZGVyCmZyb20gbG9nZ2luZyBpbXBvcnQgZ2V0TG9nZ2VyLCBGb3JtYXR0ZXIsIFN0cmVhbUhhbmRsZXIsIEZpbGVIYW5kbGVyLCBJTkZPLCBFUlJPUgpmcm9tIHNrbGVhcm4uY29tcG9zZSBpbXBvcnQgbWFrZV9jb2x1bW5fc2VsZWN0b3IgYXMgc2VsZWN0b3IKZnJvbSBza2xlYXJuLmNvbXBvc2UgaW1wb3J0IENvbHVtblRyYW5zZm9ybWVyCmZyb20gc2tsZWFybi5tZXRyaWNzIGltcG9ydCByb2NfYXVjX3Njb3JlCmZyb20gc2tsZWFybi5tb2RlbF9zZWxlY3Rpb24gaW1wb3J0IEtGb2xkCmZyb20gc2tsZWFybi5pbXB1dGUgaW1wb3J0IFNpbXBsZUltcHV0ZXIKZnJvbSBza2xlYXJuLnBpcGVsaW5lIGltcG9ydCBQaXBlbGluZQppbXBvcnQgb3MsIGdjLCBzeXMsIHRpbWUsIHJhbmRvbSwgbWF0aApmcm9tIGNvbnRleHRsaWIgaW1wb3J0IGNvbnRleHRtYW5hZ2VyCmZyb20gbWF0cGxvdGxpYiBpbXBvcnQgcHlwbG90IGFzIHBsdApmcm9tIElQeXRob24uZGlzcGxheSBpbXBvcnQgZGlzcGxheQpmcm9tIHNjaXB5IGltcG9ydCBzdGF0cywgc3BlY2lhbApmcm9tIHNrbGVhcm4gaW1wb3J0IHNldF9jb25maWcKZnJvbSBmdW5jdG9vbHMgaW1wb3J0IHBhcnRpYWwKaW1wb3J0IGxpZ2h0Z2JtIGFzIGxnYgppbXBvcnQgc2VhYm9ybiBhcyBzbnMKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgdHlwaW5nIGFzIHRwCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQgd2FybmluZ3MKCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoJ2lnbm9yZScpCgpkZWYgdHJhaW5fd2lkcyhjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICAgICAgICAgZGF0YXNldDogRGF0YUl0ZW0sCiAgICAgICAgICAgICAgIGxhYmVsX2NvbHVtbjogc3RyID0gImxhYmVscyIpOgogICAgCiAgICByYXcsIGxhYmVscywgaGVhZGVyID0gZ2V0X3NhbXBsZShkYXRhc2V0LCBzYW1wbGU9LTEsIGxhYmVsPWxhYmVsX2NvbHVtbikKICAgIHByaW50KHJhdy5zaGFwZSkKICAgIFhfdHJhaW4sIFhfdGVzdCwgeV90cmFpbiwgeV90ZXN0ID0gdHJhaW5fdGVzdF9zcGxpdCgKICAgICAgICByYXcsIGxhYmVscywgdGVzdF9zaXplPTAuMiwgcmFuZG9tX3N0YXRlPTQyKQogICAgCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KCd0cmFpbl9zZXQnLCAKICAgICAgICAgICAgICAgICAgICAgICAgZGY9cGQuY29uY2F0KFtYX3RyYWluLCB5X3RyYWluLnRvX2ZyYW1lKCldLCBheGlzPTEpLAogICAgICAgICAgICAgICAgICAgICAgICBmb3JtYXQ9J2NzdicsIGluZGV4PUZhbHNlLCAKICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3RfcGF0aD1jb250ZXh0LmFydGlmYWN0X3N1YnBhdGgoJ2RhdGEnKSkKCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KCd0ZXN0X3NldCcsIAogICAgICAgICAgICAgICAgICAgICAgICBkZj1wZC5jb25jYXQoW1hfdGVzdCwgeV90ZXN0LnRvX2ZyYW1lKCldLCBheGlzPTEpLAogICAgICAgICAgICAgICAgICAgICAgICBmb3JtYXQ9J2NzdicsIGluZGV4PUZhbHNlLCAKICAgICAgICAgICAgICAgICAgICAgICAgbGFiZWxzPXsiZGF0YS10eXBlIjogImhlbGQtb3V0In0sCiAgICAgICAgICAgICAgICAgICAgICAgIGFydGlmYWN0X3BhdGg9Y29udGV4dC5hcnRpZmFjdF9zdWJwYXRoKCdkYXRhJykpCiAgIAoKICAgIGxwYXJhbXMgPSB7fQoKICAgIGV2YWxzID0ge30KICAgIGV2YWxzWydsZ2InXSA9IHt9CiAgICBscGFyYW1zID0ge30KCiAgICBzZWVkcyA9IFswLCAxXQogICAgbmZvbGQgPSBbNSwgNV0KICAgIHN0cmF0aWZpZWQ9W0ZhbHNlLCBGYWxzZV0KICAgIHNodWZmbGU9W1RydWUsIFRydWVdCiAgICBuX2VzdGltYXRvcnMgPSAzMDAwMAogICAgZWFybHlfc3RvcHBpbmdfcm91bmRzID0gMzAwCiAgICB2ZXJib3NlX2V2YWwgPSAyCiAgICBsZWFybmluZ19yYXRlID0gMC4wMQogICAgcmVnX2FscGhhID0gWzAuNCwgMV0KICAgIHJlZ19sYW1iZGEgPSBbMC43LCAxXQogICAgc3Vic2FtcGxlID0gWzAuNDUsIDFdCiAgICBjb2xzYW1wbGVfYnl0cmVlID0gWzAuMywgMC4yMjVdCiAgICBtYXhfZGVwdGggPSAtMQogICAgdmVyYm9zZSA9IDQKICAgIG5fam9icyA9IDQKICAgIAogICAgbHBhcmFtcyA9IGRpY3QoYm9vc3RpbmdfdHlwZT0nZ2JkdCcsCiAgICAgICAgICAgICAgIG9iamVjdGl2ZT0nYmluYXJ5JywKICAgICAgICAgICAgICAgbWV0cmljPSdhdWMnLAogICAgICAgICAgICAgICBsZWFybmluZ19yYXRlPSBsZWFybmluZ19yYXRlLAogICAgICAgICAgICAgICBudW1fbGVhdmVzPSAyMDAsCiAgICAgICAgICAgICAgIG1heF9iaW49NTAwLAogICAgICAgICAgICAgICBtaW5fY2hpbGRfd2VpZ2h0PSAwLjAzNSwKICAgICAgICAgICAgICAgc3Vic2FtcGxlPSBzdWJzYW1wbGVbMF0sCiAgICAgICAgICAgICAgIGNvbHNhbXBsZV9ieXRyZWU9IGNvbHNhbXBsZV9ieXRyZWVbMF0sCiAgICAgICAgICAgICAgIG1pbl9kYXRhX2luX2xlYWY9IDE1MCwKICAgICAgICAgICAgICAgbWF4X2RlcHRoPSBtYXhfZGVwdGgsCiAgICAgICAgICAgICAgIGJhZ2dpbmdfc2VlZD0gc2VlZHNbMF0sCiAgICAgICAgICAgICAgIHJlZ19hbHBoYT0gcmVnX2FscGhhWzBdLAogICAgICAgICAgICAgICByZWdfbGFtYmRhPSByZWdfbGFtYmRhWzBdLAogICAgICAgICAgICAgICB2ZXJib3NlPSB2ZXJib3NlLAogICAgICAgICAgICAgICBzZWVkPSBzZWVkc1swXSwKICAgICAgICAgICAgICAgbl9qb2JzPSBuX2pvYnMsKQoKICAgIGV2YWxzX3Jlc3VsdCA9IHt9CiAgICB0ZXN0X3ByZWRzID0gbnAuemVyb3MobGVuKFhfdGVzdCkpICAgIAogICAgZHRyYWluID0gbGdiLkRhdGFzZXQoWF90cmFpbiwgeV90cmFpbikKICAgIGR0ZXN0ID0gbGdiLkRhdGFzZXQoWF90ZXN0LCBsYWJlbD15X3Rlc3QpCiAgICAKICAgIHRlc3RsZW4gPSBYX3Rlc3Quc2hhcGVbMF0KICAgIAogICAgc2VlZCA9IHNlZWRzWzBdCiAgICBwcmludChmJ1RyYWluaW5nIE1vZGVsIHdpdGggU0VFRCA6IHtzZWVkfScpCiAgICBpPTAKICAgIG1vZGVsID0gbGdiLnRyYWluKGxwYXJhbXMsIGR0cmFpbiwgMTAwLCB2YWxpZF9zZXRzPWR0ZXN0LCBlYXJseV9zdG9wcGluZ19yb3VuZHM9NSwgZXZhbHNfcmVzdWx0PWV2YWxzX3Jlc3VsdCkKICAgIG1vZGVsLnNhdmVfbW9kZWwoJ21vZGVsLnR4dCcsIG51bV9pdGVyYXRpb249bW9kZWwuYmVzdF9pdGVyYXRpb24pCiAgICAKICAgCiAgIAogICAgCiAgICBwcmVkID0gbW9kZWwucHJlZGljdChYX3Rlc3QpCiAgICAKCiAgICBjb250ZXh0LmxvZ19tb2RlbCgibW9kZWwiLAogICAgICAgICAgICAgICAgICAgICAgYm9keT1kdW1wcyhtb2RlbCksCiAgICAgICAgICAgICAgICAgICAgICBtb2RlbF9maWxlPSJtb2RlbC5wa2wiLAogICAgICAgICAgICAgICAgICAgICAgbWV0cmljcz1jb250ZXh0LnJlc3VsdHMsCiAgICAgICAgICAgICAgICAgICAgICBsYWJlbHM9eyJjbGFzcyI6ICJsaWdodGdibSJ9KQogICAgCgo=
           commands:
           - pip install lightgbm
           code_origin: train_wids.ipynb
@@ -325,8 +254,73 @@ spec:
           code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/test_classifier/test_classifier.ipynb
         affinity: null
       verbose: false
-  - url: db://widsdb2/serving
-    name: serving
+  - name: tstprep
+    spec:
+      kind: job
+      metadata:
+        name: tstprep
+        tag: ''
+        project: widsdb2
+      spec:
+        command: ''
+        args: []
+        image: mlrun/ml-models
+        env:
+        - name: V3IO_API
+          value: ''
+        - name: V3IO_USERNAME
+          value: ''
+        - name: V3IO_ACCESS_KEY
+          value: ''
+        default_handler: tstdata_prep
+        entry_points:
+          tstdata_prep:
+            name: tstdata_prep
+            doc: "process a raw churn data file\n\nData has 3 states here: `raw`,\
+              \ `cleaned` and `encoded`\n\n* `raw` kept by default, the pipeline begins\
+              \ with a raw data artifact\n* `cleaned` kept for charts, presentations\n\
+              * `encoded` is input for a cross validation and training function\n\n\
+              steps (not necessarily in correct order, some parallel)\n* column name\
+              \ maps\n* deal with nans and other types of missings/junk\n* label encode\
+              \ binary and ordinal category columns\n* create category ranges from\
+              \ numerical columns\nAnd finally,\n* test\n\nWhy we don't one-hot-encode\
+              \ here? One hot encoding isn't a necessary\nstep for all algorithms.\
+              \ It can also generate a very large feature\nmatrix that doesn't need\
+              \ to be serialized (even if sparse).\nSo we leave one-hot-encoding for\
+              \ the training step.\n\nWhat about scaling numerical columns? Same as\
+              \ why we don't one hot\nencode here. Do we scale before train-test split?\
+              \  IMHO, no.  Scaling\nbefore splitting introduces a type of data leakage.\
+              \  In addition,\nmany estimators are completely immune to the monotonic\
+              \ transformations\nimplied by scaling, so why waste the cycles?\n\n\
+              TODO: \n    * parallelize where possible\n    * more abstraction (more\
+              \ parameters, chain sklearn transformers)\n    * convert to marketplace\
+              \ function"
+            parameters:
+            - name: context
+              type: MLClientCtx
+              doc: the function execution context
+              default: ''
+            - name: src
+              type: DataItem
+              doc: an artifact or file path
+              default: ''
+            - name: file_ext
+              type: str
+              doc: file type for artifacts
+              default: csv
+            - name: test_enc
+              type: str
+              default: test_enc
+            outputs:
+            - default: ''
+            lineno: 22
+        description: ''
+        build:
+          functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKCmltcG9ydCBzeXMKc3lzLnBhdGguYXBwZW5kKCcvdjNpby9wcm9qZWN0cy93aWRzZGIyL3V0aWwnKQoKCmltcG9ydCBqc29uCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gY29sbGVjdGlvbnMgaW1wb3J0IGRlZmF1bHRkaWN0CmltcG9ydCB3aWRzdXRpbCBhcyB1dGlsCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzLCBkdW1wLCBsb2FkCgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKZGVmIHRzdGRhdGFfcHJlcCgKICAgIGNvbnRleHQ6TUxDbGllbnRDdHgsIAogICAgc3JjOiBEYXRhSXRlbSwKICAgIGZpbGVfZXh0OiBzdHIgPSAiY3N2IiwKICAgIHRlc3RfZW5jOiBzdHIgPSAidGVzdF9lbmMiCik6CiAgICAiIiJwcm9jZXNzIGEgcmF3IGNodXJuIGRhdGEgZmlsZQogICAgCiAgICBEYXRhIGhhcyAzIHN0YXRlcyBoZXJlOiBgcmF3YCwgYGNsZWFuZWRgIGFuZCBgZW5jb2RlZGAKICAgIAogICAgKiBgcmF3YCBrZXB0IGJ5IGRlZmF1bHQsIHRoZSBwaXBlbGluZSBiZWdpbnMgd2l0aCBhIHJhdyBkYXRhIGFydGlmYWN0CiAgICAqIGBjbGVhbmVkYCBrZXB0IGZvciBjaGFydHMsIHByZXNlbnRhdGlvbnMKICAgICogYGVuY29kZWRgIGlzIGlucHV0IGZvciBhIGNyb3NzIHZhbGlkYXRpb24gYW5kIHRyYWluaW5nIGZ1bmN0aW9uCiAgICAKICAgIHN0ZXBzIChub3QgbmVjZXNzYXJpbHkgaW4gY29ycmVjdCBvcmRlciwgc29tZSBwYXJhbGxlbCkKICAgICogY29sdW1uIG5hbWUgbWFwcwogICAgKiBkZWFsIHdpdGggbmFucyBhbmQgb3RoZXIgdHlwZXMgb2YgbWlzc2luZ3MvanVuawogICAgKiBsYWJlbCBlbmNvZGUgYmluYXJ5IGFuZCBvcmRpbmFsIGNhdGVnb3J5IGNvbHVtbnMKICAgICogY3JlYXRlIGNhdGVnb3J5IHJhbmdlcyBmcm9tIG51bWVyaWNhbCBjb2x1bW5zCiAgICBBbmQgZmluYWxseSwKICAgICogdGVzdAogICAgCiAgICBXaHkgd2UgZG9uJ3Qgb25lLWhvdC1lbmNvZGUgaGVyZT8gT25lIGhvdCBlbmNvZGluZyBpc24ndCBhIG5lY2Vzc2FyeQogICAgc3RlcCBmb3IgYWxsIGFsZ29yaXRobXMuIEl0IGNhbiBhbHNvIGdlbmVyYXRlIGEgdmVyeSBsYXJnZSBmZWF0dXJlCiAgICBtYXRyaXggdGhhdCBkb2Vzbid0IG5lZWQgdG8gYmUgc2VyaWFsaXplZCAoZXZlbiBpZiBzcGFyc2UpLgogICAgU28gd2UgbGVhdmUgb25lLWhvdC1lbmNvZGluZyBmb3IgdGhlIHRyYWluaW5nIHN0ZXAuCiAgICAKICAgIFdoYXQgYWJvdXQgc2NhbGluZyBudW1lcmljYWwgY29sdW1ucz8gU2FtZSBhcyB3aHkgd2UgZG9uJ3Qgb25lIGhvdAogICAgZW5jb2RlIGhlcmUuIERvIHdlIHNjYWxlIGJlZm9yZSB0cmFpbi10ZXN0IHNwbGl0PyAgSU1ITywgbm8uICBTY2FsaW5nCiAgICBiZWZvcmUgc3BsaXR0aW5nIGludHJvZHVjZXMgYSB0eXBlIG9mIGRhdGEgbGVha2FnZS4gIEluIGFkZGl0aW9uLAogICAgbWFueSBlc3RpbWF0b3JzIGFyZSBjb21wbGV0ZWx5IGltbXVuZSB0byB0aGUgbW9ub3RvbmljIHRyYW5zZm9ybWF0aW9ucwogICAgaW1wbGllZCBieSBzY2FsaW5nLCBzbyB3aHkgd2FzdGUgdGhlIGN5Y2xlcz8KICAgIAogICAgVE9ETzogCiAgICAgICAgKiBwYXJhbGxlbGl6ZSB3aGVyZSBwb3NzaWJsZQogICAgICAgICogbW9yZSBhYnN0cmFjdGlvbiAobW9yZSBwYXJhbWV0ZXJzLCBjaGFpbiBza2xlYXJuIHRyYW5zZm9ybWVycykKICAgICAgICAqIGNvbnZlcnQgdG8gbWFya2V0cGxhY2UgZnVuY3Rpb24KICAgICAgICAKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgICB0aGUgZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBzcmM6ICAgICAgICAgICAgICBhbiBhcnRpZmFjdCBvciBmaWxlIHBhdGgKICAgIDpwYXJhbSBmaWxlX2V4dDogICAgICAgICBmaWxlIHR5cGUgZm9yIGFydGlmYWN0cwogICAgOnBhcmFtIG1vZGVsc19kZXN0OiAgICAgICBsYWJlbCBlbmNvZGVycyBhbmQgb3RoZXIgcHJlcHJvY2Vzc2luZyBzdGVwcwogICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNob3VsZCBiZSBzYXZlZCB0b2dldGhlciB3aXRoIG90aGVyIHBpcGVsaW5lCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbW9kZWxzCiAgICA6cGFyYW0gY2xlYW5lZF9rZXk6ICAgICAga2V5IG9mIGNsZWFuZWQgZGF0YSB0YWJsZSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGVuY29kZWRfa2V5OiAgICAgIGtleSBvZiBlbmNvZGVkIGRhdGEgdGFibGUgaW4gYXJ0aWZhY3Qgc3RvcmUKICAgICIiIgogICAgZGYgPSBzcmMuYXNfZGYoKQogICAgCiAgICBkYXRhcHJlcHJvY2VzcyA9dXRpbC5EYXRhUHJlcHJvY2VzcyhkZikKICAgIGRmID0gZGF0YXByZXByb2Nlc3MucHJlcHJvY2VzcygpCgogICAgZGYgPSBkZi5maWxsbmEoMCkKICAgIGNvbnRleHQubG9nX2RhdGFzZXQodGVzdF9lbmMsIGRmPWRmLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQoK
+          commands: []
+          code_origin: tstprep.ipynb
+        affinity: null
+      verbose: false
   - url: db://widsdb2/lightgbm-serving
     name: lightgbm-serving
   - url: hub://v2_model_tester
@@ -334,8 +328,6 @@ spec:
   workflows:
   - name: main
     path: workflow.py
-  - name: main1
-    path: w1.py
   - name: infer
     path: wf.py
   artifacts:
